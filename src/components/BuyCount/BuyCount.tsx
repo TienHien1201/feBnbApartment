@@ -1,4 +1,4 @@
-import InputNumber from "../ProductRating/InputNumber";
+import InputNumber from '../ProductRating/InputNumber'
 
 export default function BuyCount() {
   return (
@@ -37,7 +37,6 @@ export default function BuyCount() {
           </svg>
         </button>
       </div>
-      <div className='ml-6 text-sm text-gray-500'>{product.id} Sản phẩm có sẳn </div>
     </div>
   )
 }

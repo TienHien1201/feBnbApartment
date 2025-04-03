@@ -5,9 +5,11 @@ import { Customer } from './customer.type'
 type Role = 'user' | 'admin'
 export interface User {
   id: number
-  ho_ten: string
+  user_name: string
   email: string
-  roles?: Role
+  quyen?: Role
+  phone?: number
+  address?: string
   password?: string
   khachHang: Customer
   avatar?: string
