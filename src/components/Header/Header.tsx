@@ -50,8 +50,9 @@ export default function Header() {
       queryClient.removeQueries({ queryKey: ['gio-hang', { status: cartsStatus.incart }] })
       navigate(path.login)
     },
-    onError: (error) => {
-      console.error('Logout error:', error)
+    onError: () => {
+      // Remove unused error parameter or handle it if needed
+      console.error('Logout error occurred')
     }
   })
 
@@ -59,14 +60,15 @@ export default function Header() {
     logoutMutation.mutate()
   }
 
-  const { data: productInCartData, error } = useQuery({
+  const { data: productInCartData } = useQuery({
     queryKey: ['carts', { idKhachHang: profile?.id }],
     queryFn: () => cartApi.getCartByIdKhachHang(profile?.id as number),
     enabled: isAuthenticated && Boolean(profile?.id),
     staleTime: 1000
   })
 
-  const productInCart = productInCartData?.data
+  // Extract the array from the SuccessResponse wrapper
+  const productInCart = productInCartData?.data || []
 
   return (
     <div
