@@ -189,6 +189,7 @@ export default function AsideFilter({ onPhanKhuFilter, onPriceRangeFilter }: Pro
             <Button
               type='submit'
               className='w-full p-2 mt-2 uppercase bg-yellow-500 text-white text-sm hover:bg-yellow-500/80'
+              isLoading={false}
             >
               Áp dụng
             </Button>
@@ -336,7 +337,10 @@ export default function AsideFilter({ onPhanKhuFilter, onPriceRangeFilter }: Pro
         </li>
       </ul>
       <div className='bg-gray-300 h-[1px] my-4' />
-      <Button className='w-full p-2 px-2 uppercase bg-yellow-500 text-white text-sm hover:bg-yellow-500/80 flex justify-center items-center'>
+      <Button
+        className='w-full p-2 px-2 uppercase bg-yellow-500 text-white text-sm hover:bg-yellow-500/80 flex justify-center items-center'
+        isLoading={false}
+      >
         Xóa tất cả
       </Button>
     </div>

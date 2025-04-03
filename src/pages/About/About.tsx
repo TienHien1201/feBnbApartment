@@ -42,22 +42,22 @@ const sections = [
   {
     title: 'Tổng quan dự án',
     content: [
-      { label: 'Chủ đầu tư', value: 'Tập đoàn Vingroup' },
-      { label: 'Vị trí', value: 'Mặt tiền đường Nguyễn Xiển và Phước Thiện, TP. Thủ Đức' },
-      { label: 'Diện tích', value: '271 ha' },
-      { label: 'Quy mô', value: '71 tòa tháp căn hộ cao tầng, hơn 44.000 căn hộ' },
-      { label: 'Khởi công', value: 'Năm 2018' }
+      { type: 'info', label: 'Chủ đầu tư', value: 'Tập đoàn Vingroup' },
+      { type: 'info', label: 'Vị trí', value: 'Mặt tiền đường Nguyễn Xiển và Phước Thiện, TP. Thủ Đức' },
+      { type: 'info', label: 'Diện tích', value: '271 ha' },
+      { type: 'info', label: 'Quy mô', value: '71 tòa tháp căn hộ cao tầng, hơn 44.000 căn hộ' },
+      { type: 'info', label: 'Khởi công', value: 'Năm 2018' }
     ]
   },
   {
     title: 'Phân khu đa dạng',
     content: [
-      { type: 'Căn hộ cao tầng', options: ['Vinhomes Sapphire', 'Ruby', 'Diamond'] },
+      { type: 'category', options: ['Vinhomes Sapphire', 'Ruby', 'Diamond'] },
       {
-        type: 'Phân khu tiêu biểu',
+        type: 'category',
         options: ['The Rainbow', 'The Origami', 'The Beverly', 'Glory Heights', 'The Opus One']
       },
-      { type: 'Khu thấp tầng', options: ['The Manhattan', 'Manhattan Glory'] }
+      { type: 'category', options: ['The Manhattan', 'Manhattan Glory'] }
     ]
   }
 ]
@@ -90,7 +90,7 @@ export default function About() {
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className='max-w-4xl mx-auto'>
             <h2 className='text-3xl font-bold text-center mb-12'>Giới thiệu tổng quan</h2>
             <div className='grid gap-8'>
-              {sections[0].content.map((item, index) => (
+              {sections[0].content.map((item: { type: string; label: string; value: string }, index: number) => (
                 <motion.div
                   key={item.label}
                   initial={{ opacity: 0, x: -20 }}
@@ -114,9 +114,9 @@ export default function About() {
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} className='max-w-4xl mx-auto'>
             <h2 className='text-3xl font-bold text-center mb-12'>Phân khu đa dạng</h2>
             <div className='grid gap-8'>
-              {sections[1].content.map((category, index) => (
+              {sections[1].content.map((category: { type: string; options: string[] }, index: number) => (
                 <motion.div
-                  key={category.type}
+                  key={index}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.2 }}
@@ -124,7 +124,7 @@ export default function About() {
                 >
                   <h3 className='text-xl font-semibold mb-4'>{category.type}</h3>
                   <div className='flex flex-wrap gap-2'>
-                    {category.options.map((option) => (
+                    {category.options.map((option: string) => (
                       <span key={option} className='px-4 py-2 bg-yellow-50 text-yellow-700 rounded-full text-sm'>
                         {option}
                       </span>
@@ -235,41 +235,38 @@ export default function About() {
       </div>
       {/* More sections following the same pattern... */}
       <p>
-
-
-   
-      Vinhomes Grand Park là một đại đô thị thông minh đẳng cấp quốc tế, được phát triển bởi Tập đoàn Vingroup – đơn vị
-      bất động sản hàng đầu Việt Nam. Dự án tọa lạc tại phường Long Thạnh Mỹ và Long Bình, TP. Thủ Đức, TP. Hồ Chí Minh,
-      với mục tiêu kiến tạo một không gian sống hiện đại, xanh, và tích hợp công nghệ tiên tiến, hướng tới mô hình đô
-      thị kiểu mẫu như Singapore. Được mệnh danh là “Thành phố thông minh - Công viên”, Vinhomes Grand Park không chỉ là
-      nơi an cư lý tưởng mà còn là điểm đến đầu tư hấp dẫn tại khu vực phía Đông TP. HCM. Thông tin cơ bản Chủ đầu tư:
-      Tập đoàn Vingroup. Vị trí: Mặt tiền đường Nguyễn Xiển và Phước Thiện, TP. Thủ Đức, TP. Hồ Chí Minh. Diện tích: 271
-      ha. Quy mô: Gồm 71 tòa tháp căn hộ cao tầng, hơn 44.000 căn hộ, cùng các khu thấp tầng như nhà phố, shophouse, và
-      biệt thự. Thời gian khởi công: Năm 2018, với các phân khu được bàn giao dần từ năm 2020. Phong cách thiết kế: Hiện
-      đại, kết hợp không gian xanh và công nghệ 4.0. Đặc điểm nổi bật Vị trí chiến lược: Nằm tại trung tâm TP. Thủ Đức,
-      khu vực được định hướng trở thành thành phố sáng tạo phía Đông của TP. HCM. Giáp hai con sông lớn: sông Đồng Nai
-      và sông Tắc, tạo nên môi trường sống thoáng đãng, phong thủy hài hòa. Kết nối thuận tiện với các tuyến giao thông
-      huyết mạch như Vành Đai 3 (dự kiến hoàn thành 2025), cao tốc Long Thành - Dầu Giây, và tuyến Metro số 1 Bến Thành
-      - Suối Tiên. Quy hoạch thông minh: Mật độ xây dựng thấp: Chỉ khoảng 25%, phần còn lại dành cho công viên, cây
-      xanh, mặt nước và tiện ích công cộng. Phân khu đa dạng: Căn hộ cao tầng: Bao gồm các dòng sản phẩm Vinhomes
-      Sapphire (bình dân), Ruby (trung cấp), và Diamond (cao cấp). Các phân khu tiêu biểu: The Rainbow, The Origami, The
-      Beverly, The Beverly Solari, Glory Heights, The Opus One. Khu thấp tầng: The Manhattan và Manhattan Glory với nhà
-      phố thương mại (shophouse), biệt thự ven sông. Công nghệ 4.0: Ứng dụng quản lý thông minh qua app cư dân, hệ thống
-      an ninh 24/7, camera AI, và radar giao thông. Hệ thống tiện ích đẳng cấp: Công viên 36 ha: Lớn nhất Đông Nam Á,
-      được gọi là “Công viên ánh sáng”, tích hợp 15 công viên chủ đề như công viên nước, khu BBQ, sân thể thao, đường
-      dạo bộ ven sông. Hệ sinh thái Vingroup: Trung tâm thương mại Vincom Mega Mall (dự kiến khai trương quý 2/2025),
-      bệnh viện Vinmec, trường học Vinschool, xe buýt điện VinBus. Không gian sống xanh: Hơn 50% diện tích dành cho cây
-      xanh và mặt nước, mang lại bầu không khí trong lành hiếm có giữa lòng đô thị. Tầm nhìn và giá trị Tầm nhìn:
-      Vinhomes Grand Park hướng tới trở thành biểu tượng đô thị mới của TP. HCM, kết hợp hài hòa giữa không gian sống,
-      làm việc, và giải trí trong một hệ sinh thái khép kín. Giá trị cốt lõi: Tiện nghi: Mọi nhu cầu từ giáo dục, y tế,
-      mua sắm đến vui chơi đều được đáp ứng trong nội khu. Bền vững: Thiết kế chú trọng môi trường, tiết kiệm năng lượng
-      và bảo vệ hệ sinh thái tự nhiên. Cộng đồng: Thu hút cư dân đa dạng từ gia đình trẻ, người nước ngoài, đến giới đầu
-      tư, tạo nên một cộng đồng văn minh, hiện đại. Tiến độ và thành tựu Đã hoàn thiện: Các phân khu như The Rainbow
-      (bàn giao 2020), The Origami (bàn giao 2021-2022) đã đi vào hoạt động với tỷ lệ cư dân lấp đầy cao. Đang triển
-      khai: The Beverly, The Beverly Solari, và The Opus One dự kiến bàn giao trong năm 2025-2026. Thành tựu: Vinhomes
-      Grand Park được vinh danh là “Dự án bất động sản tốt nhất” tại nhiều giải thưởng uy tín trong nước và quốc tế, nhờ
-      quy hoạch đột phá và chất lượng sống vượt trội.
-         </p>
+        Vinhomes Grand Park là một đại đô thị thông minh đẳng cấp quốc tế, được phát triển bởi Tập đoàn Vingroup – đơn
+        vị bất động sản hàng đầu Việt Nam. Dự án tọa lạc tại phường Long Thạnh Mỹ và Long Bình, TP. Thủ Đức, TP. Hồ Chí
+        Minh, với mục tiêu kiến tạo một không gian sống hiện đại, xanh, và tích hợp công nghệ tiên tiến, hướng tới mô
+        hình đô thị kiểu mẫu như Singapore. Được mệnh danh là “Thành phố thông minh - Công viên”, Vinhomes Grand Park
+        không chỉ là nơi an cư lý tưởng mà còn là điểm đến đầu tư hấp dẫn tại khu vực phía Đông TP. HCM. Thông tin cơ
+        bản Chủ đầu tư: Tập đoàn Vingroup. Vị trí: Mặt tiền đường Nguyễn Xiển và Phước Thiện, TP. Thủ Đức, TP. Hồ Chí
+        Minh. Diện tích: 271 ha. Quy mô: Gồm 71 tòa tháp căn hộ cao tầng, hơn 44.000 căn hộ, cùng các khu thấp tầng như
+        nhà phố, shophouse, và biệt thự. Thời gian khởi công: Năm 2018, với các phân khu được bàn giao dần từ năm 2020.
+        Phong cách thiết kế: Hiện đại, kết hợp không gian xanh và công nghệ 4.0. Đặc điểm nổi bật Vị trí chiến lược: Nằm
+        tại trung tâm TP. Thủ Đức, khu vực được định hướng trở thành thành phố sáng tạo phía Đông của TP. HCM. Giáp hai
+        con sông lớn: sông Đồng Nai và sông Tắc, tạo nên môi trường sống thoáng đãng, phong thủy hài hòa. Kết nối thuận
+        tiện với các tuyến giao thông huyết mạch như Vành Đai 3 (dự kiến hoàn thành 2025), cao tốc Long Thành - Dầu
+        Giây, và tuyến Metro số 1 Bến Thành - Suối Tiên. Quy hoạch thông minh: Mật độ xây dựng thấp: Chỉ khoảng 25%,
+        phần còn lại dành cho công viên, cây xanh, mặt nước và tiện ích công cộng. Phân khu đa dạng: Căn hộ cao tầng:
+        Bao gồm các dòng sản phẩm Vinhomes Sapphire (bình dân), Ruby (trung cấp), và Diamond (cao cấp). Các phân khu
+        tiêu biểu: The Rainbow, The Origami, The Beverly, The Beverly Solari, Glory Heights, The Opus One. Khu thấp
+        tầng: The Manhattan và Manhattan Glory với nhà phố thương mại (shophouse), biệt thự ven sông. Công nghệ 4.0: Ứng
+        dụng quản lý thông minh qua app cư dân, hệ thống an ninh 24/7, camera AI, và radar giao thông. Hệ thống tiện ích
+        đẳng cấp: Công viên 36 ha: Lớn nhất Đông Nam Á, được gọi là “Công viên ánh sáng”, tích hợp 15 công viên chủ đề
+        như công viên nước, khu BBQ, sân thể thao, đường dạo bộ ven sông. Hệ sinh thái Vingroup: Trung tâm thương mại
+        Vincom Mega Mall (dự kiến khai trương quý 2/2025), bệnh viện Vinmec, trường học Vinschool, xe buýt điện VinBus.
+        Không gian sống xanh: Hơn 50% diện tích dành cho cây xanh và mặt nước, mang lại bầu không khí trong lành hiếm có
+        giữa lòng đô thị. Tầm nhìn và giá trị Tầm nhìn: Vinhomes Grand Park hướng tới trở thành biểu tượng đô thị mới
+        của TP. HCM, kết hợp hài hòa giữa không gian sống, làm việc, và giải trí trong một hệ sinh thái khép kín. Giá
+        trị cốt lõi: Tiện nghi: Mọi nhu cầu từ giáo dục, y tế, mua sắm đến vui chơi đều được đáp ứng trong nội khu. Bền
+        vững: Thiết kế chú trọng môi trường, tiết kiệm năng lượng và bảo vệ hệ sinh thái tự nhiên. Cộng đồng: Thu hút cư
+        dân đa dạng từ gia đình trẻ, người nước ngoài, đến giới đầu tư, tạo nên một cộng đồng văn minh, hiện đại. Tiến
+        độ và thành tựu Đã hoàn thiện: Các phân khu như The Rainbow (bàn giao 2020), The Origami (bàn giao 2021-2022) đã
+        đi vào hoạt động với tỷ lệ cư dân lấp đầy cao. Đang triển khai: The Beverly, The Beverly Solari, và The Opus One
+        dự kiến bàn giao trong năm 2025-2026. Thành tựu: Vinhomes Grand Park được vinh danh là “Dự án bất động sản tốt
+        nhất” tại nhiều giải thưởng uy tín trong nước và quốc tế, nhờ quy hoạch đột phá và chất lượng sống vượt trội.
+      </p>
       {/* You can add more sections like Timeline, Gallery, etc. */}
     </div>
   )

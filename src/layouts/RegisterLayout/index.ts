@@ -1,3 +1,3 @@
-import Registerlayout from "./Registerlayout";
+import Registerlayout from './RegisterLayout'
 
 export default Registerlayout

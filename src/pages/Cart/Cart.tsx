@@ -38,7 +38,7 @@ export default function Cart() {
     })
   })
 
-  const productInCartdata = productIncart?.data
+  const productInCartdata = productIncart?.data || []
   console.log(productInCartdata)
   console.log(productInCartdata?.map((product) => product.id))
 
@@ -123,8 +123,8 @@ export default function Cart() {
   }
 
   useEffect(() => {
-    if (productInCartdata) {
-      const total = productInCartdata.reduce((sum: any, product: any) => sum + Number(product.can_ho.gia_ban), 0)
+    if (productInCartdata && productInCartdata.length > 0) {
+      const total = productInCartdata.reduce((sum, product) => sum + Number(product.can_ho.gia_ban), 0)
       setTotalPrice(total)
     }
   }, [productInCartdata])
@@ -212,7 +212,7 @@ export default function Cart() {
                 </div>
 
                 {/* Product List */}
-                {productInCartdata?.map((product, index) => (
+                {productInCartdata?.map((product: any, index: number) => (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -330,7 +330,7 @@ export default function Cart() {
                 <Link
                   to={path.booking}
                   className='mt-5 flex h-12 items-center justify-center gap-2 bg-gradient-to-r from-yellow-500 to-yellow-400 px-8 text-sm uppercase text-white hover:from-yellow-600 hover:to-yellow-500 transition-all rounded-lg sm:ml-4 sm:mt-0 shadow-md hover:shadow-lg'
-                  onClick={() => productInCartdata?.forEach((cart) => handleAddBooking(cart))}
+                  onClick={() => productInCartdata?.forEach((cart: any) => handleAddBooking(cart))}
                 >
                   <FaCalendar className='text-lg' />
                   Đặt lịch ngay

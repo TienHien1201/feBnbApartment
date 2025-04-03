@@ -30,7 +30,7 @@ export default function EditApartment() {
 
   useEffect(() => {
     if (productData?.data) {
-      setFormData(productData.data)
+      setFormData(productData.data as unknown as Product)
     }
   }, [productData])
 

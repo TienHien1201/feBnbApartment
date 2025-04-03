@@ -25,7 +25,7 @@ export default function News() {
     { icon: <FaHome />, value: '44K+', label: 'Căn hộ' }
   ]
 
-  const highlights = [
+  const _highlights = [
     {
       icon: <FaMapMarkerAlt className='text-yellow-500 text-2xl' />,
       title: 'Vị trí chiến lược',
@@ -58,7 +58,7 @@ export default function News() {
     // Add more zones...
   ]
 
-  const amenities = [
+  const _amenities = [
     {
       icon: <FaTree className='text-3xl text-green-500' />,
       title: 'Công viên 36ha',

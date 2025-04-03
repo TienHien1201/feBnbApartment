@@ -37,12 +37,11 @@ export default function Login() {
 
       setIsAuthenticated(true)
       setProfile(data.data.user)
-      // setProfile(data.data.khachhang)
 
       // Lưu vào localStorage
       setProfileToLS(data.data.user)
 
-      setTokensToLS(data.data.access_token, data.data.refresh_token)
+      setTokensToLS(data.data.access_token, data.data.refresh_token || '')
       setIsAuthenticatedToLS(true)
 
       navigate(path.product)
@@ -52,8 +51,8 @@ export default function Login() {
         const formError = error.response?.data.data
         if (formError) {
           Object.keys(formError).forEach((key) => {
-            setError(key as keyof FormData, {
-              message: formError[key as keyof FormData]
+            setError(key as keyof Omit<FormData, 'username'>, {
+              message: formError[key as keyof Omit<FormData, 'username'>]
             })
           })
         }

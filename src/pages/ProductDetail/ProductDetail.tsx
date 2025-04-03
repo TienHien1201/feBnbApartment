@@ -6,7 +6,6 @@ import { formatCurrency, formatNumberToSocialStyle, getIdFromNameId, rateSale } 
 
 import DOMPurify from 'dompurify' //Giup chong loi XSS, loai bo cac ma script doc hai de khong bị lấy access_token
 
-import { QueryConfig } from '../ProductList/ProductList'
 import { isUndefined, omitBy } from 'lodash'
 import useQueryParam from '../../hooks/useQueryParam'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
@@ -33,6 +32,15 @@ import {
 
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Autoplay } from 'swiper/modules'
+
+// Define QueryConfig if it doesn't exist elsewhere
+type QueryConfig = {
+  page?: string
+  limit?: number
+  sort_by?: string
+  name?: string
+  order?: string
+}
 
 export default function ProductDetail() {
   const { isAuthenticated } = useContext(AppContext)
@@ -228,24 +236,26 @@ export default function ProductDetail() {
                 {/* Title Section */}
                 <div className='flex items-center gap-3'>
                   <FaHome className='text-yellow-600 text-2xl' />
-                  <h1 className='text-2xl font-bold text-gray-800'>{product.ten_toa_can_ho}</h1>
+                  {product && <h1 className='text-2xl font-bold text-gray-800'>{product.ten_toa_can_ho}</h1>}
                 </div>
 
                 {/* Status and Rating Section */}
                 <div className='mt-6 flex items-center bg-white p-4 rounded-lg shadow-sm'>
                   <div className='flex items-center gap-2'>
                     <FaCheckCircle className='text-green-500 text-xl' />
-                    <span className='font-medium text-green-600'>{product.tinh_trang_can_ho}</span>
-                    <ProductRating
-                      rating={product.gia_ban}
-                      activeClassname='fill-yellow-400 text-yellow-400 h-4 w-4'
-                      nonActiveClassname='fill-gray-300 text-gray-300 h-4 w-4'
-                    />
+                    {product && <span className='font-medium text-green-600'>{product.tinh_trang_can_ho}</span>}
+                    {product && (
+                      <ProductRating
+                        rating={product.gia_ban}
+                        activeClassname='fill-yellow-400 text-yellow-400 h-4 w-4'
+                        nonActiveClassname='fill-gray-300 text-gray-300 h-4 w-4'
+                      />
+                    )}
                   </div>
                   <div className='mx-4 h-4 w-[1px] bg-gray-300'></div>
                   <div className='flex items-center gap-2'>
                     <FaInfoCircle className='text-blue-500' />
-                    <span className='font-medium'>{formatNumberToSocialStyle(product.gia_thu_ve)}</span>
+                    {product && <span className='font-medium'>{formatNumberToSocialStyle(product.gia_thu_ve)}</span>}
                     <span className='text-gray-500'>Đã bán</span>
                   </div>
                 </div>
@@ -255,13 +265,21 @@ export default function ProductDetail() {
                   <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-2'>
                       <FaMoneyBillWave className='text-green-600 text-xl' />
-                      <span className='text-gray-500 line-through text-lg'>₫{formatCurrency(product.gia_thu_ve)}</span>
+                      {product && (
+                        <span className='text-gray-500 line-through text-lg'>
+                          ₫{formatCurrency(product.gia_thu_ve)}
+                        </span>
+                      )}
                     </div>
                     <div className='flex items-center gap-4'>
-                      <div className='text-3xl font-bold text-red-600'>₫{formatCurrency(product.gia_ban)}</div>
-                      <div className='bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold'>
-                        -{rateSale(product.gia_thu_ve, product.gia_ban)}
-                      </div>
+                      {product && (
+                        <div className='text-3xl font-bold text-red-600'>₫{formatCurrency(product.gia_ban)}</div>
+                      )}
+                      {product && (
+                        <div className='bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold'>
+                          -{rateSale(product.gia_thu_ve, product.gia_ban)}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -274,15 +292,15 @@ export default function ProductDetail() {
                   </div>
                   <div className='flex items-center gap-2'>
                     <FaFileAlt className='text-yellow-500' />
-                    <span>Chú Thích: {product.chu_thich}</span>
+                    {product && <span>Chú Thích: {product.chu_thich}</span>}
                   </div>
                   <div className='flex items-center gap-2'>
                     <FaHome className='text-yellow-500' />
-                    <span>Loại căn hộ: {product.loai_can_ho}</span>
+                    {product && <span>Loại căn hộ: {product.loai_can_ho}</span>}
                   </div>
                   <div className='flex items-center gap-2'>
                     <FaInfoCircle className='text-yellow-500' />
-                    <span>Diện tích: {product.dien_tich}</span>
+                    {product && <span>Diện tích: {product.dien_tich}</span>}
                   </div>
                 </div>
 
@@ -313,12 +331,14 @@ export default function ProductDetail() {
               <h2 className='text-xl font-bold text-gray-800'>Mô tả sản phẩm</h2>
             </div>
             <div className='prose prose-lg max-w-none'>
-              <div
-                className='text-gray-600 leading-relaxed'
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(product.chu_thich)
-                }}
-              />
+              {product && (
+                <div
+                  className='text-gray-600 leading-relaxed'
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(product.chu_thich)
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>

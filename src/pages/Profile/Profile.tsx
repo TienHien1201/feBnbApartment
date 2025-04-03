@@ -16,14 +16,14 @@ export default function Profile() {
               <div className='w-32 h-32 rounded-full bg-gray-200 mb-4 overflow-hidden'>
                 <img
                   src={
-                    profile.avatar ||
+                    profile?.avatar ||
                     'https://static.vecteezy.com/system/resources/thumbnails/000/439/863/small/Basic_Ui__28186_29.jpg'
                   }
                   alt='Avatar'
                   className='w-full h-full object-cover'
                 />
               </div>
-              <h3 className='text-xl font-semibold mb-2'>{profile.username}</h3>
+              <h3 className='text-xl font-semibold mb-2'>{profile?.username || 'User'}</h3>
 
               <button className='w-full bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600 transition-colors'>
                 Chỉnh sửa hồ sơ
@@ -70,7 +70,7 @@ export default function Profile() {
                     <FaUser className='text-xl text-yellow-500' />
                     <div>
                       <p className='text-sm text-gray-500'>Họ tên</p>
-                      <p className='font-semibold'>{profile.username}</p>
+                      <p className='font-semibold'>{profile?.username || 'N/A'}</p>
                     </div>
                   </div>
 
@@ -78,7 +78,7 @@ export default function Profile() {
                     <FaEnvelope className='text-xl text-yellow-500' />
                     <div>
                       <p className='text-sm text-gray-500'>Email</p>
-                      <p className='font-semibold'>{profile.email}</p>
+                      <p className='font-semibold'>{profile?.email || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -88,7 +88,7 @@ export default function Profile() {
                     <FaPhone className='text-xl text-yellow-500' />
                     <div>
                       <p className='text-sm text-gray-500'>Số điện thoại</p>
-                      <p className='font-semibold'>{profile.phone}</p>
+                      <p className='font-semibold'>{profile?.phone || 'N/A'}</p>
                     </div>
                   </div>
 
@@ -96,7 +96,7 @@ export default function Profile() {
                     <FaIdCard className='text-xl text-yellow-500' />
                     <div>
                       <p className='text-sm text-gray-500'>Mã tài khoản</p>
-                      <p className='font-semibold'>{profile.id}</p>
+                      <p className='font-semibold'>{profile?.id || 'N/A'}</p>
                     </div>
                   </div>
                 </div>
@@ -109,7 +109,7 @@ export default function Profile() {
                   <FaMapMarkerAlt className='text-xl text-yellow-500' />
                   <div>
                     <p className='text-sm text-gray-500'>Địa chỉ</p>
-                    <p className='font-semibold'>{profile.address || 'Chưa cập nhật'}</p>
+                    <p className='font-semibold'>{profile?.address || 'Chưa cập nhật'}</p>
                   </div>
                 </div>
               </div>

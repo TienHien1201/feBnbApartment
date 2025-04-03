@@ -21,18 +21,19 @@ export default function BookingHistory() {
   console.log(userId)
   const { data: historyBookingData } = useQuery({
     queryKey: ['booking', userId],
-    queryFn: () => bookingApi.getBookingByIdKhachHang(userId),
+    queryFn: () => bookingApi.getBookingByIdKhachHang(userId || 0),
     enabled: Boolean(userId) // Chỉ gọi API khi có userId
   })
-  console.log(historyBookingData)
+
+  const bookings = historyBookingData?.data || []
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 6
 
-  const totalItems = historyBookingData?.data?.length || 0
+  const totalItems = bookings.length || 0
   const totalPages = Math.ceil(totalItems / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const currentItems = historyBookingData?.data?.slice(startIndex, endIndex) || []
+  const currentItems = bookings.slice(startIndex, endIndex) || []
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)
@@ -56,7 +57,7 @@ export default function BookingHistory() {
 
         <div className='space-y-6'>
           {currentItems.length > 0 ? (
-            currentItems.map((item) => (
+            currentItems.map((item: any) => (
               <div
                 key={item.id}
                 className='p-6 rounded-lg shadow-lg bg-gradient-to-r from-green-400 to-blue-500 text-white hover:shadow-xl transition-all duration-300'

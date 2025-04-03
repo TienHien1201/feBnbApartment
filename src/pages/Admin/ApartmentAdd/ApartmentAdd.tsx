@@ -42,7 +42,7 @@ const schema = yup.object().shape({
   ten_toa_can_ho: yup.string().required('Tên tòa căn hộ không được để trống'),
   ten_can_ho: yup.string().required('Tên căn hộ không được để trống'),
   loai_can_ho: yup.string().required('Loại căn hộ không được để trống'),
-  chu_thich: yup.string(),
+  chu_thich: yup.string().required('Chú thích không được để trống'),
   tinh_trang_can_ho: yup.string().required('Tình trạng căn hộ không được để trống'),
   loai_kinh_doanh: yup.string().required('Loại kinh doanh không được để trống'),
   ma_phan_khu: yup.number().required('Mã phân khu không được để trống'),
@@ -181,7 +181,7 @@ export default function ApartmentAdd() {
         }
 
         // Gọi API để thêm sản phẩm
-        const result = await addProductMutation.mutateAsync(productData)
+        await addProductMutation.mutateAsync(productData)
 
         toast.dismiss(loadingToast)
         toast.success('Thêm căn hộ thành công!')

@@ -7,13 +7,14 @@ const path = {
   profile: '/profile',
   productdetails: ':nameId',
   cart: '/cart',
-  booking: '/booking',
   groups: '/groups',
-  canvas: '360',
+  Admin: '/manager',
+  booking: '/booking',
   about: '/about',
   news: '/news',
-  addForm: '/addForm',
-  Admin: '/ManagerApartment',
+  canvas: '/canvas',
+  addForm: '/addform',
+  refreshToken: '/refresh-token',
   editProduct: '/edit/:id'
 } as const
 
