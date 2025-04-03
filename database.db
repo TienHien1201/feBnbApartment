@@ -1,0 +1,257 @@
+-- Cơ sở dữ liệu: QuanLyCanHo
+drop database if exists QuanLyCanHo;
+CREATE DATABASE QuanLyCanHo;
+USE QuanLyCanHo;
+
+-- Bảng tài khoản người dùng
+CREATE TABLE tai_khoan (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    phone varchar(20) not null,
+	quyen ENUM('user', 'admin') DEFAULT 'user',
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Bảng phân khu
+CREATE TABLE phan_khu (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ten_phan_khu VARCHAR(255) NOT NULL,
+    dia_chi VARCHAR(255) NOT NULL,
+    quy_mo TEXT,
+    tien_ich TEXT,
+    loai_hinh_san_pham TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE can_ho (
+    id INT AUTO_INCREMENT PRIMARY KEY, -- Mã căn hộ
+    ten_toa_can_ho VARCHAR(255) NOT NULL, -- Tên tòa căn hộ (ví dụ: BS1513.17, BS1513.18)
+    ten_can_ho VARCHAR(255) NOT NULL, -- Tên căn hộ (ví dụ: 1710)
+    loai_can_ho VARCHAR(50) NOT NULL, -- Loại căn hộ (ví dụ: 2br2wc, 3br3wc, 1br plus)
+    chu_thich VARCHAR(255), -- Chú thích (sơ cấp hoặc thứ cấp)
+    tinh_trang_can_ho VARCHAR(255) NOT NULL, -- Tình trạng căn hộ (ví dụ: full nội thất, trống, bếp rèm)
+    loai_kinh_doanh ENUM('Thuê', 'Bán') NOT NULL, -- Loại kinh doanh (thuê hoặc bán)
+    ma_phan_khu INT, -- Mã phân khu (foreign key tham chiếu đến bảng PhanKhu)
+    dien_tich VARCHAR(100) NOT NULL, -- Diện tích (ví dụ: 69.2m²(Tim) - 63m²(TT))
+    gia_thu_ve DECIMAL(15, 2), -- Giá thuê thu về
+    gia_ban DECIMAL(15, 2), -- Giá bán
+    huong VARCHAR(50), -- Hướng căn hộ (ví dụ: Đông Nam)
+    luot_xem INT DEFAULT 0,
+    ngay_dang TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_hot_deal BOOLEAN DEFAULT FALSE,
+    giam_gia DECIMAL(5,2) DEFAULT 0.00,
+    FOREIGN KEY (ma_phan_khu) REFERENCES phan_khu(id) ON DELETE SET NULL -- Khóa ngoại tham chiếu đến bảng PhanKhu
+);
+
+CREATE INDEX idx_luot_xem ON can_ho(luot_xem);
+CREATE INDEX idx_ngay_dang ON can_ho(ngay_dang);
+CREATE INDEX idx_is_hot_deal ON can_ho(is_hot_deal);
+
+CREATE TABLE hinh_anh_can_ho (
+    id INT AUTO_INCREMENT PRIMARY KEY,          
+    id_can_ho INT NOT NULL,                   
+    duong_dan_hinh VARCHAR(255) NOT NULL,      -- Đường dẫn ảnh (URL hoặc local path)
+    FOREIGN KEY (id_can_ho) REFERENCES can_ho(id) ON DELETE CASCADE
+);
+
+-- Bảng khách hàng
+CREATE TABLE khach_hang (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ma_tai_khoan INT NOT NULL,
+    ho_ten VARCHAR(255) NOT NULL,
+    so_dien_thoai VARCHAR(20) NOT NULL,
+    email VARCHAR(255),
+    dia_chi TEXT null,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (ma_tai_khoan) REFERENCES tai_khoan(id) ON DELETE CASCADE
+);
+
+-- Bảng giỏ hàng
+--  Trạng thái
+--  -1 : căn hộ đang trong giỏ hàng
+--  0 : tất cả căn hộ
+--  1: đã cọc chờ thanh toán
+--  2: đã thanh toán
+--  3: đã xem
+CREATE TABLE gio_hang (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    id_can_ho INT NOT NULL,
+    id_khach_hang INT NOT NULL,-- Modify gio_hang table to include user reference
+    ngay_xem_canho TIMESTAMP DEFAULT CURRENT_TIMESTAMP,_hang 
+    trang_thai TINYINT NOT NULL DEFAULT -1, NOT NULL,
+    FOREIGN KEY (id_can_ho) REFERENCES can_ho(id) ON DELETE CASCADE,ai_khoan(id) ON DELETE CASCADE;
+    FOREIGN KEY (id_khach_hang) REFERENCES khach_hang(id) ON DELETE CASCADE,
+    CHECK (trang_thai IN (-1, 0, 1, 2, 3)) -- Ràng buộc giá trị hợp lệ cho trang_thai
+);
+REMENT PRIMARY KEY,
+
+-- Bảng tin tức  noi_dung TEXT NOT NULL,
+CREATE TABLE tin_tuc (    ngay_dang TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    tieu_de VARCHAR(255) NOT NULL,REFERENCES tai_khoan(id) ON DELETE SET NULL
+    noi_dung TEXT NOT NULL,
+    ngay_dang TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    nguoi_dang INT,
+    FOREIGN KEY (nguoi_dang) REFERENCES tai_khoan(id) ON DELETE SET NULL
+);
+
+-- Bảng yêu cầu hỗ trợ  noi_dung TEXT NOT NULL,
+CREATE TABLE yeu_cau_ho_tro (    trang_thai ENUM('Đang xử lý', 'Đã hoàn thành') DEFAULT 'Đang xử lý',
+    id INT AUTO_INCREMENT PRIMARY KEY,P DEFAULT CURRENT_TIMESTAMP,
+    id_khach_hang INT NOT NULL,NCES khach_hang(id) ON DELETE CASCADE
+    noi_dung TEXT NOT NULL,
+    trang_thai ENUM('Đang xử lý', 'Đã hoàn thành') DEFAULT 'Đang xử lý',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_khach_hang) REFERENCES khach_hang(id) ON DELETE CASCADECREMENT PRIMARY KEY,
+);
+
+CREATE TABLE danh_gia (5
+    id INT AUTO_INCREMENT PRIMARY KEY,  noi_dung TEXT,
+    id_can_ho INT NOT NULL,    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id_khach_hang INT NOT NULL,ho) REFERENCES can_ho(id) ON DELETE CASCADE,
+    diem_danh_gia TINYINT CHECK (diem_danh_gia BETWEEN 1 AND 5), -- Điểm 1-5NCES khach_hang(id) ON DELETE CASCADE
+    noi_dung TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_can_ho) REFERENCES can_ho(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_khach_hang) REFERENCES khach_hang(id) ON DELETE CASCADE KEY,
+);t cả khách hàng
+    tieu_de VARCHAR(255) NOT NULL,
+    noi_dung TEXT NOT NULL,EATE TABLE thong_bao (
+    id INT AUTO_INCREMENT PRIMARY KEY,    da_doc BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,gửi chung cho tất cả khách hàng
+    FOREIGN KEY (id_nguoi_nhan) REFERENCES tai_khoan(id) ON DELETE CASCADE5) NOT NULL,
+); NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_nguoi_nhan) REFERENCES tai_khoan(id) ON DELETE CASCADE
+);  ma_tai_khoan INT,
+    PRIMARY KEY (ma_khach_hang, ma_tai_khoan), -- Khóa chính ghép
+    FOREIGN KEY (ma_khach_hang) REFERENCES khach_hang(id) ON DELETE CASCADE,oan (
+    FOREIGN KEY (ma_tai_khoan) REFERENCES tai_khoan(id) ON DELETE CASCADE
+);T,
+a_khach_hang, ma_tai_khoan), -- Khóa chính ghép
+create table lich_su_dat_lich(Y (ma_khach_hang) REFERENCES khach_hang(id) ON DELETE CASCADE,
+    FOREIGN KEY (ma_tai_khoan) REFERENCES tai_khoan(id) ON DELETE CASCADE
+-- id_gio_hang int,
+id_khach_hang int,
+id_can_ho int,
+ngay_xem_canho TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  int auto_increment primary key,
+-- foreign key (id_gio_hang) references gio_hang(id) on delete cascade,-- id_gio_hang int,
+foreign key (id_khach_hang) references khach_hang(id) on delete cascade,
+foreign key (id_can_ho) references can_ho(id) on delete cascade
+);NT_TIMESTAMP, 
+ng) references gio_hang(id) on delete cascade,
+-- Modify lich_su_dat_lich table to include user reference erences khach_hang(id) on delete cascade,
+ALTER TABLE lich_su_dat_liches can_ho(id) on delete cascade
+ADD COLUMN id_user INT NOT NULL,
+d) ON DELETE CASCADE;
+-- Bảng lưu trữ token
+CREATE TABLE tokens (
+    id INT AUTO_INCREMENT PRIMARY KEY,EATE TABLE tokens (
+    user_id INT NOT NULL,    id INT AUTO_INCREMENT PRIMARY KEY,
+    access_token TEXT NOT NULL,
+    refresh_token TEXT NOT NULL,
+    access_token_expires_at TIMESTAMP NOT NULL,
+    refresh_token_expires_at TIMESTAMP NOT NULL,    access_token_expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,STAMP NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES tai_khoan(id) ON DELETE CASCADE
+);
+
+-- Thêm dữ liệu cho bảng tai_khoan
+INSERT INTO tai_khoan (username, email, password, phone, quyen) VALUES
+('user1', 'user1@example.com', 'password123','0123456789', 'user');
+
+-- Thêm dữ liệu cho bảng phan_khu
+INSERT INTO phan_khu (ten_phan_khu, dia_chi, quy_mo, tien_ich, loai_hinh_san_pham) VALUES-- Thêm dữ liệu cho bảng phan_khu
+('The Rainbow', '123 Đường A', '500 căn hộ', 'Hồ bơi, Gym', 'Căn hộ chung cư'),khu, dia_chi, quy_mo, tien_ich, loai_hinh_san_pham) VALUES
+('The Origami', '456 Đường B', '300 căn hộ', 'Siêu thị, Trường học', 'Nhà phố'),
+('Glory Heights', '789 Đường C', '700 căn hộ', 'Công viên, Trung tâm thương mại', 'Biệt thự'),
+('The Beverly solary', '101 Đường D', '400 căn hộ', 'Trung tâm thể thao', 'Căn hộ mini'),
+('The Beverly', '111 Đường E', '200 căn hộ', 'Bảo vệ 24/7', 'Shophouse'),
+('The Opus One', '222 Đường F', '600 căn hộ', 'Bãi đỗ xe thông minh', 'Căn hộ duplex'),
+('Masteri Centre Point ', '333 Đường G', '550 căn hộ', 'Sân chơi trẻ em', 'Penthouse');
+
+-- Thêm dữ liệu cho bảng can_ho
+INSERT INTO can_ho (ten_toa_can_ho, ten_can_ho, loai_can_ho, chu_thich, tinh_trang_can_ho, loai_kinh_doanh, ma_phan_khu, dien_tich, gia_thu_ve, gia_ban, huong) VALUES
+('BS1513.17', '101', '2br2wc', 'Căn góc', 'Full nội thất', 'Thuê', 1, '69.2m²(Tim) - 63m²(TT)', 10000000, 2500000000, 'Đông'),ien_tich, gia_thu_ve, gia_ban, huong) VALUES
+('BS1513.18', '102', '3br3wc', '', 'Trống', 'Bán', 2, '85m²(Tim) - 78m²(TT)', 0, 3000000000, 'Tây Nam'),0000, 'Đông'),
+('BS1513.19', '103', '1br plus', 'Sơ cấp', 'Bếp rèm', 'Thuê', 3, '55m²(Tim) - 50m²(TT)', 7000000, 1800000000, 'Bắc'),
+('BS1513.20', '104', '2br2wc', '', 'Full nội thất', 'Bán', 4, '70m²(Tim) - 65m²(TT)', 0, 2800000000, 'Nam'),('BS1513.19', '103', '1br plus', 'Sơ cấp', 'Bếp rèm', 'Thuê', 3, '55m²(Tim) - 50m²(TT)', 7000000, 1800000000, 'Bắc'),
+('BS1513.21', '105', '3br3wc', '', 'Trống', 'Thuê', 5, '90m²(Tim) - 85m²(TT)', 12000000, 3200000000, 'Đông Bắc'), nội thất', 'Bán', 4, '70m²(Tim) - 65m²(TT)', 0, 2800000000, 'Nam'),
+('BS1513.22', '106', '1br', 'Thứ cấp', 'Bếp rèm', 'Bán', 6, '50m²(Tim) - 45m²(TT)', 0, 1500000000, 'Tây'),im) - 85m²(TT)', 12000000, 3200000000, 'Đông Bắc'),
+('BS1513.23', '107', '2br2wc', '', 'Full nội thất', 'Thuê', 7, '72m²(Tim) - 68m²(TT)', 9500000, 2600000000, 'Nam'), - 45m²(TT)', 0, 1500000000, 'Tây'),
+('BS1513.24', '108', '3br3wc', '', 'Trống', 'Bán', 2, '92m²(Tim) - 88m²(TT)', 0, 3500000000, 'Tây Bắc'),i thất', 'Thuê', 7, '72m²(Tim) - 68m²(TT)', 9500000, 2600000000, 'Nam'),
+('BS1513.25', '109', '1br plus', 'Sơ cấp', 'Bếp rèm', 'Thuê', 3, '58m²(Tim) - 52m²(TT)', 7500000, 1700000000, 'Đông Nam'), 'Bán', 2, '92m²(Tim) - 88m²(TT)', 0, 3500000000, 'Tây Bắc'),
+('BS1513.26', '110', '2br2wc', '', 'Full nội thất', 'Bán', 1, '75m²(Tim) - 70m²(TT)', 0, 2900000000, 'Tây Nam'),'Bếp rèm', 'Thuê', 3, '58m²(Tim) - 52m²(TT)', 7500000, 1700000000, 'Đông Nam'),
+('BS2515.10', '111', 'stu', '', 'Full nội thất', 'Bán', 4, '40m²(Tim) - 50m²(TT)', 0, 1900000000, 'Tây Bắc');i thất', 'Bán', 1, '75m²(Tim) - 70m²(TT)', 0, 2900000000, 'Tây Nam'),
+)', 0, 1900000000, 'Tây Bắc');
+-- Thêm dữ liệu cho bảng hinh_anh_can_ho
+INSERT INTO hinh_anh_can_ho (id_can_ho, duong_dan_hinh) VALUES
+(1, 'https://vinhome.com.vn/wp-content/uploads/2023/04/mat-abng.jpg'),ng_dan_hinh) VALUES
+(1, 'https://images.placeholders.dev/350'),
+(1, 'https://images.placeholders.dev/350'),
+(1, 'https://images.placeholders.dev/350'),
+(1, 'https://images.placeholders.dev/350'),
+(2, 'https://i.pinimg.com/236x/1c/f3/98/1cf3984e15de48a2ebff863c86324835.jpg'),
+(2, 'https://images.placeholders.dev/350'),
+(2, 'https://images.placeholders.dev/350'),
+(2, 'https://images.placeholders.dev/350'),
+(3, 'https://i.pinimg.com/236x/ae/10/72/ae1072da514b4c6d3fd460b619b49a08.jpg'),
+(3, 'https://images.placeholders.dev/350'),
+(4, 'https://i.pinimg.com/236x/50/e9/c1/50e9c1b309abbdcbb15def6e7225676d.jpg'),
+(4, 'https://images.placeholders.dev/350'),
+(4, 'https://images.placeholders.dev/350'),
+(5, 'https://i.pinimg.com/236x/2a/18/ad/2a18adfe306bb820835f776bc497483c.jpg'),
+(5, 'https://images.placeholders.dev/350'),8adfe306bb820835f776bc497483c.jpg'),
+(6, 'https://i.pinimg.com/236x/a3/ae/67/a3ae67725e137b71e64c3a4e3da92ddb.jpg'),
+(6, 'https://images.placeholders.dev/350'),67725e137b71e64c3a4e3da92ddb.jpg'),
+(7, 'https://i.pinimg.com/236x/c0/e5/e5/c0e5e5e92703f3139b27c506fae66997.jpg'),
+(7, 'https://i.pinimg.com/236x/c0/e5/e5/c0e5e5e92703f3139b27c506fae66997.jpg'),(7, 'https://i.pinimg.com/236x/c0/e5/e5/c0e5e5e92703f3139b27c506fae66997.jpg'),
+(8, 'https://i.pinimg.com/236x/78/ee/84/78ee8464941b8ee96498dccbfb0bcde6.jpg'),5/e5/c0e5e5e92703f3139b27c506fae66997.jpg'),
+(8, 'https://images.placeholders.dev/350'),
+(9, 'https://i.pinimg.com/236x/1c/c1/70/1cc170682cebb1cf858133e6d20d6dd5.jpg'),
+(9, 'https://images.placeholders.dev/350'),(9, 'https://i.pinimg.com/236x/1c/c1/70/1cc170682cebb1cf858133e6d20d6dd5.jpg'),
+(10, 'https://i.pinimg.com/236x/ce/94/d5/ce94d56abfc81b8f946048b3058774a7.jpg'),dev/350'),
+(10, 'https://images.placeholders.dev/350'),),
+(11, 'https://i.pinimg.com/236x/95/44/41/9544418361bce353ffa3e6c60ff4e2c8.jpg');ps://images.placeholders.dev/350'),
+0ff4e2c8.jpg');
+-- Thêm dữ liệu cho bảng khach_hang
+INSERT INTO khach_hang (ma_tai_khoan, ho_ten, so_dien_thoai, email, dia_chi) VALUES
+(1, 'Nguyễn Văn A', '0901234567', 'a@example.com', '123 Đường A');tai_khoan, ho_ten, so_dien_thoai, email, dia_chi) VALUES
+;
+-- Thêm dữ liệu cho bảng gio_hang
+-- INSERT INTO gio_hang (id_can_ho, id_khach_hang, ngay_xem_canho, trang_thai)
+-- VALUES_can_ho, id_khach_hang, ngay_xem_canho, trang_thai)
+-- -- id_can_ho = 1, id_khach_hang = 1, trạng thái: tất cả căn hộ
+-- (1, 1, '2024-01-01', 0),h_hang = 1, trạng thái: tất cả căn hộ
+-- -- id_can_ho = 2, id_khach_hang = 2, trạng thái: tất cả căn hộ
+-- (2, 2, '2024-02-02', 1),ch_hang = 2, trạng thái: tất cả căn hộ
+-- -- id_can_ho = 3, id_khach_hang = 3, trạng thái: tất cả căn hộ
+-- (3, 3, '2024-03-03', -1);ch_hang = 3, trạng thái: tất cả căn hộ
+-- id_can_ho = 4, id_khach_hang = 4, trạng thái: tất cả căn hộ
+-- (4, 4, '2024-04-04', 2),hang = 4, trạng thái: tất cả căn hộ
+-- -- id_can_ho = 5, id_khach_hang = 5, trạng thái: tất cả căn hộ
+-- (5, 5, '2024-05-05', -1),ch_hang = 5, trạng thái: tất cả căn hộ
+-- -- id_can_ho = 6, id_khach_hang = 6, trạng thái: tất cả căn hộ
+-- (6, 6, '2024-06-06', 2),_hang = 6, trạng thái: tất cả căn hộ
+-- -- id_can_ho = 7, id_khach_hang = 7, trạng thái: tất cả căn hộ-- (6, 6, '2024-06-06', 2),
+-- (7, 7, '2024-07-07', 3),
+-- -- id_can_ho = 8, id_khach_hang = 8, trạng thái: tất cả căn hộ
+-- (8, 8, '2024-08-08', 0),-- -- id_can_ho = 8, id_khach_hang = 8, trạng thái: tất cả căn hộ
+
+
+
+
+
+
+
+
+-- VALUES (1, 5, '2025-03-16 10:00:00');-- INSERT INTO lich_su_dat_lich (id_khach_hang, id_can_ho, ngay_xem_canho) -- (10, 10, '2024-10-10', 3);-- -- id_can_ho = 10, id_khach_hang = 10, trạng thái: tất cả căn hộ-- (9, 9, '2024-09-09', 2),-- -- id_can_ho = 9, id_khach_hang = 9, trạng thái: tất cả căn hộ-- (8, 8, '2024-08-08', 0),
+-- -- id_can_ho = 9, id_khach_hang = 9, trạng thái: tất cả căn hộ
+-- (9, 9, '2024-09-09', 2),
+-- -- id_can_ho = 10, id_khach_hang = 10, trạng thái: tất cả căn hộ
+-- (10, 10, '2024-10-10', 3);
+
+-- INSERT INTO lich_su_dat_lich (id_khach_hang, id_can_ho, ngay_xem_canho) 
+-- VALUES (1, 5, '2025-03-16 10:00:00');
