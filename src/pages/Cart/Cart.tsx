@@ -8,7 +8,7 @@ import { useEffect, useState, useContext } from 'react'
 import Calendar from 'react-calendar'
 import 'react-calendar/dist/Calendar.css'
 import bookingApi from '../../apis/historybooking.api'
-import { bookingType } from '../../types/booking.type'
+
 import { queryClient } from '../../main'
 import {
   FaShoppingCart,
@@ -20,8 +20,8 @@ import {
   FaBuilding
 } from 'react-icons/fa'
 import { motion } from 'framer-motion'
-// import { getProfileFromLS } from '../../utils/auth'
 import { AppContext } from '../../contexts/app.context'
+import type { Cart as CartType } from '../../types/cart.type'
 
 export default function Cart() {
   const { profile } = useContext(AppContext)
@@ -32,15 +32,12 @@ export default function Cart() {
     queryFn: () => cartApi.getCartByIdKhachHang(idKhachHang as number),
     enabled: Boolean(idKhachHang),
     staleTime: 1000,
-    // Thêm defaultOptions để xử lý mặc định khi không có dữ liệu
     select: (data) => ({
-      data: data.data || [] // Trả về mảng rỗng nếu không có dữ liệu
+      data: data.data || { data: [] }
     })
   })
 
-  const productInCartdata = productIncart?.data || []
-  console.log(productInCartdata)
-  console.log(productInCartdata?.map((product) => product.id))
+  const productInCartdata: CartType[] = Array.isArray(productIncart?.data?.data) ? productIncart.data.data : []
 
   const updateMutation = useMutation({
     mutationFn: ({
@@ -79,41 +76,35 @@ export default function Cart() {
   const [selectedDates, setSelectedDates] = useState<{ [key: number]: Date }>({})
   const [showCalendar, setShowCalendar] = useState<number | null>(null)
 
-  const handleAddBooking = async (cart: bookingType) => {
+  const handleAddBooking = async (cart: CartType) => {
     try {
       const selectedDate = selectedDates[cart.id]
 
-      // Format date to YYYY-MM-DD HH:mm:ss format
       const formatDate = (date: Date) => {
         return date.toISOString().slice(0, 19).replace('T', ' ')
       }
 
       let ngayXemCanHo
       if (selectedDate) {
-        // Set time to noon (12:00:00) of selected date
         const dateWithTime = new Date(selectedDate)
         dateWithTime.setHours(12, 0, 0, 0)
         ngayXemCanHo = formatDate(dateWithTime)
       } else if (cart.ngay_xem_canho) {
-        // Format existing date
         const existingDate = new Date(cart.ngay_xem_canho)
         existingDate.setHours(12, 0, 0, 0)
         ngayXemCanHo = formatDate(existingDate)
       } else {
-        // Default to current date at noon
         const now = new Date()
         now.setHours(12, 0, 0, 0)
         ngayXemCanHo = formatDate(now)
       }
 
-      // Chờ đặt lịch xong rồi mới xóa
       await Booking.mutateAsync({
         id_khach_hang: cart.id_khach_hang,
         id_can_ho: cart.id_can_ho,
         ngay_xem_canho: ngayXemCanHo
       })
 
-      // Sau khi booking thành công, mới xóa giỏ hàng
       await deleteMutation.mutateAsync(cart.id)
       refetch()
       console.log(`🟢 Đặt lịch thành công và đã xóa giỏ hàng có ID: ${cart.id}`)
@@ -124,7 +115,10 @@ export default function Cart() {
 
   useEffect(() => {
     if (productInCartdata && productInCartdata.length > 0) {
-      const total = productInCartdata.reduce((sum, product) => sum + Number(product.can_ho.gia_ban), 0)
+      const total = productInCartdata.reduce(
+        (sum: number, product: CartType) => sum + Number(product.can_ho?.gia_ban || 0),
+        0
+      )
       setTotalPrice(total)
     }
   }, [productInCartdata])
@@ -132,7 +126,6 @@ export default function Cart() {
   const handleDateChange = (date: Date, cartId: number, idCanHo: number, userId: number, trangThai: number) => {
     setSelectedDates((prev) => ({ ...prev, [cartId]: date }))
 
-    // Format date to YYYY-MM-DD HH:mm:ss
     const formatDate = (date: Date) => {
       return date.toISOString().slice(0, 19).replace('T', ' ')
     }
@@ -162,7 +155,6 @@ export default function Cart() {
   return (
     <div className='bg-gradient-to-b from-gray-50 to-gray-100 py-16 min-h-screen'>
       <div className='container max-w-7xl mx-auto px-4'>
-        {/* Header Card */}
         <div className='mb-8'>
           <h1 className='text-3xl font-bold text-gray-800 flex items-center gap-3'>
             <FaShoppingCart className='text-yellow-500' />
@@ -173,10 +165,8 @@ export default function Cart() {
 
         {productInCartdata && productInCartdata.length > 0 ? (
           <>
-            {/* Main Content */}
             <div className='overflow-auto'>
               <div className='min-w-[1000px]'>
-                {/* Header */}
                 <div className='grid grid-cols-12 rounded-lg bg-white py-5 px-9 text-sm capitalize text-gray-500 shadow-md'>
                   <div className='col-span-6'>
                     <div className='flex items-center'>
@@ -211,8 +201,7 @@ export default function Cart() {
                   </div>
                 </div>
 
-                {/* Product List */}
-                {productInCartdata?.map((product: any, index: number) => (
+                {productInCartdata.map((product: CartType, index: number) => (
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -230,7 +219,7 @@ export default function Cart() {
                             <div className='flex'>
                               <Link className='h-20 w-20 flex-shrink-0' to={path.productdetails}>
                                 <img
-                                  alt={product.can_ho.ten_toa_can_ho}
+                                  alt={product.can_ho?.ten_toa_can_ho || 'Căn hộ'}
                                   src={product.can_ho?.hinh_anh_can_ho?.[0]?.duong_dan_hinh}
                                 />
                               </Link>
@@ -247,12 +236,13 @@ export default function Cart() {
                         <div className='grid grid-cols-5 items-center'>
                           <div className='col-span-2'>
                             <div className='flex items-center justify-center'>
-                              <span className='ml-3 line-through'>₫{formatCurrency(product.can_ho.gia_thu_ve)}</span>
-                              <span className='ml-3 '>₫{formatCurrency(product.can_ho.gia_ban)}</span>
+                              <span className='ml-3 line-through'>
+                                ₫{formatCurrency(Number(product.can_ho?.gia_thu_ve || 0))}
+                              </span>
+                              <span className='ml-3 '>₫{formatCurrency(Number(product.can_ho?.gia_ban || 0))}</span>
                             </div>
                           </div>
 
-                          {/* Ô Ngày Xem Căn Hộ với Calendar */}
                           <div className='col-span-1 relative'>
                             <div
                               className='flex items-center justify-center cursor-pointer border border-gray-200 py-1'
@@ -260,9 +250,9 @@ export default function Cart() {
                             >
                               <span>
                                 {selectedDates[product.id]
-                                  ? selectedDates[product.id].toLocaleDateString('vi-VN') // ✅ Lấy từ state nếu có
+                                  ? selectedDates[product.id].toLocaleDateString('vi-VN')
                                   : product.ngay_xem_canho
-                                    ? new Date(product.ngay_xem_canho).toLocaleDateString('vi-VN') // ✅ Lấy từ API nếu có
+                                    ? new Date(product.ngay_xem_canho).toLocaleDateString('vi-VN')
                                     : 'Chọn ngày'}
                               </span>
                             </div>
@@ -278,7 +268,7 @@ export default function Cart() {
                                       product.trang_thai
                                     )
                                   }
-                                  value={selectedDates[product.id_gio_hang] || new Date()}
+                                  value={selectedDates[product.id] || new Date()}
                                   minDate={currentDate}
                                 />
                               </div>
@@ -286,7 +276,9 @@ export default function Cart() {
                           </div>
 
                           <div className='col-span-1'>
-                            <span className='font-bold text-red-700'>₫{formatCurrency(product.can_ho.gia_ban)}</span>
+                            <span className='font-bold text-red-700'>
+                              ₫{formatCurrency(Number(product.can_ho?.gia_ban || 0))}
+                            </span>
                           </div>
                           <div className='col-span-1'>
                             <button
@@ -304,7 +296,6 @@ export default function Cart() {
               </div>
             </div>
 
-            {/* Footer */}
             <div className='sticky bottom-0 z-10 mt-8 flex flex-col rounded-lg border border-gray-100 bg-white p-5 shadow-lg sm:flex-row sm:items-center'>
               <div className='flex items-center'>
                 <div className='flex flex-shrink-0 items-center justify-center pr-3'>
@@ -330,7 +321,7 @@ export default function Cart() {
                 <Link
                   to={path.booking}
                   className='mt-5 flex h-12 items-center justify-center gap-2 bg-gradient-to-r from-yellow-500 to-yellow-400 px-8 text-sm uppercase text-white hover:from-yellow-600 hover:to-yellow-500 transition-all rounded-lg sm:ml-4 sm:mt-0 shadow-md hover:shadow-lg'
-                  onClick={() => productInCartdata?.forEach((cart: any) => handleAddBooking(cart))}
+                  onClick={() => productInCartdata.forEach((cart: CartType) => handleAddBooking(cart))}
                 >
                   <FaCalendar className='text-lg' />
                   Đặt lịch ngay

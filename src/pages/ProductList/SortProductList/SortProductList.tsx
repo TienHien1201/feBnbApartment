@@ -1,10 +1,3 @@
-// import classNames from 'classnames'
-// import { sortBy, order as orderConstant } from '../../../constants/product'
-// import { QueryConfig } from '../ProductList'
-// import { ProductListConfig } from '../../../types/product.type'
-// import { createSearchParams, Link, useNavigate } from 'react-router-dom'
-// import path from '../../../constants/path'
-// import { omit } from 'lodash'
 
 interface Props {
   page_size: number
@@ -12,7 +5,11 @@ interface Props {
   onFilter: (type: 'popular' | 'newest' | 'hot') => void
 }
 
-export default function SortProductList({ page_size, onSort, onFilter }: Props) {
+export default function SortProductList({
+
+  onSort,
+  onFilter
+}: Props) {
   const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value as 'asc' | 'desc'
     if (value) {

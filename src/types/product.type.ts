@@ -30,13 +30,13 @@ export interface CreateProduct {
 }
 
 // Keep the existing Product interface for fetched data
-export interface Product extends CreateProduct {
+export interface ProductType extends CreateProduct {
   id: string
   phan_khu: PhanKhu
 }
 
 export interface ProductList {
-  data: Product[]
+  data: ProductType[]
   pagination: {
     page: number
     limit: number

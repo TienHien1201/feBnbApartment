@@ -3,16 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom'
 import productApi from '../../apis/product.api'
 import ProductRating from '../../components/ProductRating'
 import { formatCurrency, formatNumberToSocialStyle, getIdFromNameId, rateSale } from '../../utils/utils'
-
 import DOMPurify from 'dompurify' //Giup chong loi XSS, loai bo cac ma script doc hai de khong bị lấy access_token
-
 import { isUndefined, omitBy } from 'lodash'
 import useQueryParam from '../../hooks/useQueryParam'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import Product from '../ProductList/Product'
-import { Product as productType, ProductListConfig } from '../../types/product.type'
 import cartApi from '../../apis/cart.api'
-
 import { AppContext } from '../../contexts/app.context'
 import { queryClient } from '../../main'
 import { cartsStatus } from '../../constants/cart'
@@ -32,6 +28,12 @@ import {
 
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation, Pagination, Autoplay } from 'swiper/modules'
+import { ProductListConfig, ProductType } from '../../types/product.type'
+
+interface Image {
+  id?: number
+  duong_dan_hinh: string
+}
 
 // Define QueryConfig if it doesn't exist elsewhere
 type QueryConfig = {
@@ -54,24 +56,23 @@ export default function ProductDetail() {
       return productApi.getProductDetails(id as string)
     }
   })
-  const product = productDetailData?.data
+  const productData = productDetailData?.data?.data
   const { profile } = useContext(AppContext)
   const [currenIndexImage, setCurrentIndexImage] = useState([0, 5])
   const [isActiveImg, setIsActiveImg] = useState('')
   const imageRef = useRef<HTMLImageElement>(null)
   const currentImages = useMemo(
-    () => (product ? product.hinh_anh_can_ho.slice(...currenIndexImage) : []),
-    [product, currenIndexImage]
+    () => (productData ? productData.hinh_anh_can_ho?.slice(...currenIndexImage) : []),
+    [productData, currenIndexImage]
   )
   useEffect(() => {
-    if (product && product.hinh_anh_can_ho.length > 0) {
-      setIsActiveImg(product.hinh_anh_can_ho[0].duong_dan_hinh)
+    if (productData && productData.hinh_anh_can_ho && productData.hinh_anh_can_ho.length > 0) {
+      setIsActiveImg(productData.hinh_anh_can_ho[0].duong_dan_hinh)
     }
-  }, [product])
+  }, [productData])
   const addToCartMutation = useMutation(cartApi.addToCart)
   const queryParams = useQueryParam()
   const queryConfig: QueryConfig = omitBy(
-    //omit la 1 ham cua lodas giup loc ra cac gia tri thoa man dk cua chung ta. Cu the queryConfig se loai bo nhung gia tri undefined
     {
       page: queryParams.page || '1',
       limit: queryParams.limit || 10,
@@ -81,7 +82,7 @@ export default function ProductDetail() {
     },
     isUndefined
   )
-  const { data, error } = useQuery({
+  const { data: productsData } = useQuery({
     queryKey: ['can-ho', queryConfig],
     queryFn: () => {
       return productApi.getProducts(queryConfig as ProductListConfig)
@@ -89,9 +90,9 @@ export default function ProductDetail() {
     keepPreviousData: true
   })
 
-  if (!product) return null
+  if (!productData) return null
   const next = () => {
-    if (currenIndexImage[1] < (product as productType).hinh_anh_can_ho.length) {
+    if (currenIndexImage[1] < (productData.hinh_anh_can_ho?.length || 0)) {
       setCurrentIndexImage((prev) => [prev[0] + 1, prev[1] + 1])
     }
   }
@@ -108,7 +109,6 @@ export default function ProductDetail() {
     const image = imageRef.current as HTMLImageElement
     const { naturalHeight, naturalWidth } = image
 
-    // Chỉ zoom nếu kích thước tự nhiên lớn hơn kích thước hiện tại
     if (naturalWidth > rect.width || naturalHeight > rect.height) {
       const offsetX = event.pageX - (rect.x + window.scrollX)
       const offsetY = event.pageY - (rect.y + window.scrollY)
@@ -137,9 +137,13 @@ export default function ProductDetail() {
       }, 2000)
       return
     }
+    if (!profile) {
+      toast.error('Không thể xác định thông tin người dùng. Vui lòng đăng nhập lại.', { autoClose: 2000 })
+      return
+    }
     addToCartMutation.mutate(
       {
-        id_can_ho: product.id,
+        id_can_ho: parseInt(productData.id),
         id_khach_hang: profile.id,
         ngay_xem_canho: new Date(),
         trang_thai: 0
@@ -162,7 +166,6 @@ export default function ProductDetail() {
       <div className='container'>
         <div className='bg-white p-6 shadow-lg rounded-lg'>
           <div className='grid grid-cols-12 gap-9'>
-            {/* Left column with image section */}
             <div className='col-span-5'>
               <div
                 className='relative w-full overflow-hidden pt-[100%] shadow cursor-zoom-in'
@@ -171,13 +174,12 @@ export default function ProductDetail() {
               >
                 <img
                   src={isActiveImg}
-                  alt={product?.ten_can_ho}
+                  alt={productData?.ten_can_ho}
                   className='absolute top-0 left-0 w-full h-full object-cover bg-white'
                   ref={imageRef}
                 />
               </div>
 
-              {/*Slider */}
               <div className='relative mt-4 grid grid-cols-5 gap-1'>
                 <button
                   className='absolute top-1/2 left-0 z-10 h-9 w-5 -translate-x-1/2 bg-black/20 text-white'
@@ -194,7 +196,7 @@ export default function ProductDetail() {
                     <path strokeLinecap='round' strokeLinejoin='round' d='M15.75 19.5 8.25 12l7.5-7.5' />
                   </svg>
                 </button>
-                {currentImages.map((img) => {
+                {currentImages.map((img: Image) => {
                   const isActive = img.duong_dan_hinh === isActiveImg
                   return (
                     <div
@@ -204,10 +206,9 @@ export default function ProductDetail() {
                     >
                       <img
                         src={img.duong_dan_hinh}
-                        alt={product?.ten_can_ho}
+                        alt={productData?.ten_can_ho}
                         className='absolute top-0 left-0 w-full h-full cursor-pointer object-cover bg-white'
                       />
-                      {/* Khi re vao anh ben duoi anhdetail thi anh ben duoi anh detail se co boder la 1 lop div nam sau */}
                       {isActive && <div className='absolute inset-0 border-2 border-orange-700'></div>}
                     </div>
                   )
@@ -230,23 +231,20 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {/* Right column with product info */}
             <div className='col-span-7'>
               <div className='bg-gradient-to-r from-yellow-50 to-white p-6 rounded-lg'>
-                {/* Title Section */}
                 <div className='flex items-center gap-3'>
                   <FaHome className='text-yellow-600 text-2xl' />
-                  {product && <h1 className='text-2xl font-bold text-gray-800'>{product.ten_toa_can_ho}</h1>}
+                  {productData && <h1 className='text-2xl font-bold text-gray-800'>{productData.ten_toa_can_ho}</h1>}
                 </div>
 
-                {/* Status and Rating Section */}
                 <div className='mt-6 flex items-center bg-white p-4 rounded-lg shadow-sm'>
                   <div className='flex items-center gap-2'>
                     <FaCheckCircle className='text-green-500 text-xl' />
-                    {product && <span className='font-medium text-green-600'>{product.tinh_trang_can_ho}</span>}
-                    {product && (
+                    {productData && <span className='font-medium text-green-600'>{productData.tinh_trang_can_ho}</span>}
+                    {productData && (
                       <ProductRating
-                        rating={product.gia_ban}
+                        rating={productData.gia_ban}
                         activeClassname='fill-yellow-400 text-yellow-400 h-4 w-4'
                         nonActiveClassname='fill-gray-300 text-gray-300 h-4 w-4'
                       />
@@ -255,36 +253,36 @@ export default function ProductDetail() {
                   <div className='mx-4 h-4 w-[1px] bg-gray-300'></div>
                   <div className='flex items-center gap-2'>
                     <FaInfoCircle className='text-blue-500' />
-                    {product && <span className='font-medium'>{formatNumberToSocialStyle(product.gia_thu_ve)}</span>}
+                    {productData && (
+                      <span className='font-medium'>{formatNumberToSocialStyle(productData.gia_thu_ve)}</span>
+                    )}
                     <span className='text-gray-500'>Đã bán</span>
                   </div>
                 </div>
 
-                {/* Price Section */}
                 <div className='mt-6 bg-gray-50 p-6 rounded-lg shadow-sm'>
                   <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-2'>
                       <FaMoneyBillWave className='text-green-600 text-xl' />
-                      {product && (
+                      {productData && (
                         <span className='text-gray-500 line-through text-lg'>
-                          ₫{formatCurrency(product.gia_thu_ve)}
+                          ₫{formatCurrency(productData.gia_thu_ve)}
                         </span>
                       )}
                     </div>
                     <div className='flex items-center gap-4'>
-                      {product && (
-                        <div className='text-3xl font-bold text-red-600'>₫{formatCurrency(product.gia_ban)}</div>
+                      {productData && (
+                        <div className='text-3xl font-bold text-red-600'>₫{formatCurrency(productData.gia_ban)}</div>
                       )}
-                      {product && (
+                      {productData && (
                         <div className='bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold'>
-                          -{rateSale(product.gia_thu_ve, product.gia_ban)}
+                          -{rateSale(productData.gia_thu_ve, productData.gia_ban)}
                         </div>
                       )}
                     </div>
                   </div>
                 </div>
 
-                {/* Additional Info */}
                 <div className='mt-6 grid grid-cols-2 gap-4 bg-white p-4 rounded-lg'>
                   <div className='flex items-center gap-2'>
                     <FaMapMarkerAlt className='text-yellow-500' />
@@ -292,19 +290,18 @@ export default function ProductDetail() {
                   </div>
                   <div className='flex items-center gap-2'>
                     <FaFileAlt className='text-yellow-500' />
-                    {product && <span>Chú Thích: {product.chu_thich}</span>}
+                    {productData && <span>Chú Thích: {productData.chu_thich}</span>}
                   </div>
                   <div className='flex items-center gap-2'>
                     <FaHome className='text-yellow-500' />
-                    {product && <span>Loại căn hộ: {product.loai_can_ho}</span>}
+                    {productData && <span>Loại căn hộ: {productData.loai_can_ho}</span>}
                   </div>
                   <div className='flex items-center gap-2'>
                     <FaInfoCircle className='text-yellow-500' />
-                    {product && <span>Diện tích: {product.dien_tich}</span>}
+                    {productData && <span>Diện tích: {productData.dien_tich}</span>}
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className='mt-8 flex items-center gap-4'>
                   <button
                     onClick={addCart}
@@ -323,7 +320,6 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* Description Section with enhanced styling */}
         <div className='mt-8'>
           <div className='bg-white p-6 shadow-lg rounded-lg'>
             <div className='flex items-center gap-2 border-b border-gray-200 pb-4 mb-6'>
@@ -331,11 +327,11 @@ export default function ProductDetail() {
               <h2 className='text-xl font-bold text-gray-800'>Mô tả sản phẩm</h2>
             </div>
             <div className='prose prose-lg max-w-none'>
-              {product && (
+              {productData && (
                 <div
                   className='text-gray-600 leading-relaxed'
                   dangerouslySetInnerHTML={{
-                    __html: DOMPurify.sanitize(product.chu_thich)
+                    __html: DOMPurify.sanitize(productData.chu_thich)
                   }}
                 />
               )}
@@ -343,7 +339,6 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* Related Products Section */}
         <div className='mt-8'>
           <div className='container'>
             <div className='bg-white p-6 rounded-lg shadow-lg'>
@@ -362,7 +357,7 @@ export default function ProductDetail() {
                 </div>
               </div>
 
-              {data && (
+              {productsData && productsData.data && (
                 <Swiper
                   modules={[Navigation, Pagination, Autoplay]}
                   spaceBetween={20}
@@ -392,13 +387,15 @@ export default function ProductDetail() {
                   }}
                   className='related-products-slider'
                 >
-                  {data.data.map((product) => (
-                    <SwiperSlide key={product.id} className='pb-10'>
-                      <div className='h-full'>
-                        <Product product={product} />
-                      </div>
-                    </SwiperSlide>
-                  ))}
+                  {productsData.data.data &&
+                    Array.isArray(productsData.data.data) &&
+                    productsData.data.data.map((product: ProductType) => (
+                      <SwiperSlide key={product.id} className='pb-10'>
+                        <div className='h-full'>
+                          <Product product={product} />
+                        </div>
+                      </SwiperSlide>
+                    ))}
                 </Swiper>
               )}
             </div>

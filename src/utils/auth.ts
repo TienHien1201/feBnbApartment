@@ -1,10 +1,14 @@
-import { User } from '../types/user.type'
+import { User as UserType } from '../types/user.type'
+import { User as AuthUserType } from '../types/auth.type'
 
 // Lưu profile và token vào localStorage
-export const setProfileToLS = (profile: User) => {
-  if (profile) {
-    localStorage.setItem('profile', JSON.stringify(profile))
+export const setProfileToLS = (profile: AuthUserType) => {
+  // Chuyển đổi từ AuthUserType sang UserType nếu cần
+  const userProfile: Partial<UserType> = {
+    ...profile
+    // Có thể thêm giá trị mặc định cho khachHang nếu cần
   }
+  localStorage.setItem('profile', JSON.stringify(userProfile))
 }
 
 // Lưu access_token và refresh_token vào localStorage
@@ -19,7 +23,7 @@ export const setIsAuthenticatedToLS = (isAuthenticated: boolean) => {
 }
 
 // Lấy profile từ localStorage
-export const getProfileFromLS = (): User | null => {
+export const getProfileFromLS = (): UserType | null => {
   const result = localStorage.getItem('profile')
   return result ? JSON.parse(result) : null
 }

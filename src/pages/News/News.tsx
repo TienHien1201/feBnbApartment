@@ -1,10 +1,8 @@
 import { motion } from 'framer-motion'
 import {
-  FaMapMarkerAlt,
   FaBuilding,
   FaTree,
-  FaSubway,
-  FaShoppingBag, // Changed from FaShoppingMall
+
   FaHome,
   FaCheckCircle,
   FaMoneyBillWave
@@ -25,19 +23,19 @@ export default function News() {
     { icon: <FaHome />, value: '44K+', label: 'Căn hộ' }
   ]
 
-  const _highlights = [
-    {
-      icon: <FaMapMarkerAlt className='text-yellow-500 text-2xl' />,
-      title: 'Vị trí chiến lược',
-      content: 'Mặt tiền đường Nguyễn Xiển và Phước Thiện, TP. Thủ Đức'
-    },
-    {
-      icon: <FaSubway className='text-yellow-500 text-2xl' />,
-      title: 'Kết nối thuận tiện',
-      content: 'Gần Vành Đai 3, cao tốc Long Thành - Dầu Giây, Metro số 1'
-    }
-    // ... add more highlights as needed
-  ]
+  // const highlights = [
+  //   {
+  //     icon: <FaMapMarkerAlt className='text-yellow-500 text-2xl' />,
+  //     title: 'Vị trí chiến lược',
+  //     content: 'Mặt tiền đường Nguyễn Xiển và Phước Thiện, TP. Thủ Đức'
+  //   },
+  //   {
+  //     icon: <FaSubway className='text-yellow-500 text-2xl' />,
+  //     title: 'Kết nối thuận tiện',
+  //     content: 'Gần Vành Đai 3, cao tốc Long Thành - Dầu Giây, Metro số 1'
+  //   }
+  //   // ... add more highlights as needed
+  // ]
 
   const projectZones = [
     {
@@ -58,19 +56,19 @@ export default function News() {
     // Add more zones...
   ]
 
-  const _amenities = [
-    {
-      icon: <FaTree className='text-3xl text-green-500' />,
-      title: 'Công viên 36ha',
-      description: 'Công viên ánh sáng lớn nhất Đông Nam Á'
-    },
-    {
-      icon: <FaShoppingBag className='text-3xl text-blue-500' />, // Changed from FaShoppingMall
-      title: 'Vincom Mega Mall',
-      description: 'Trung tâm mua sắm lớn nhất miền Nam'
-    }
-    // Add more amenities...
-  ]
+  // const amenities = [
+  //   {
+  //     icon: <FaTree className='text-3xl text-green-500' />,
+  //     title: 'Công viên 36ha',
+  //     description: 'Công viên ánh sáng lớn nhất Đông Nam Á'
+  //   },
+  //   {
+  //     icon: <FaShoppingBag className='text-3xl text-blue-500' />, // Changed from FaShoppingMall
+  //     title: 'Vincom Mega Mall',
+  //     description: 'Trung tâm mua sắm lớn nhất miền Nam'
+  //   }
+  //   // Add more amenities...
+  // ]
 
   return (
     <div className='min-h-screen bg-gray-50'>

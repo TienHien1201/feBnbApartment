@@ -40,8 +40,8 @@ export default function GroupApartment() {
     )
   }
 
-  const groupList = data?.data
-  console.log(groupList)
+  const groupArray: GroupType[] = data?.data?.data || []
+  console.log(groupArray)
   return (
     <div className='bg-gray-50 min-h-screen'>
       <div className='container mx-auto p-4'>
@@ -55,9 +55,9 @@ export default function GroupApartment() {
 
         <AnimatePresence>
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8'>
-            {groupList?.map((group: GroupType, index) => (
+            {groupArray.map((group: GroupType, index: number) => (
               <motion.div
-                key={group.id}
+                key={group.id || index}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}

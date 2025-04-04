@@ -1,5 +1,5 @@
 import http from '../utils/http'
-import { Cart, cartList } from '../types/cart.type'
+import { Cart, CartList, cartList } from '../types/cart.type'
 import { SuccessResponse } from '../types/untils.type'
 const URL = 'gio-hang/'
 const cartApi = {
@@ -7,7 +7,7 @@ const cartApi = {
     return http.post<SuccessResponse<Cart>>(`${URL}add-to-cart`, body)
   },
   getALlCartByStatus(params: { status: cartList }) {
-    return http.get<SuccessResponse<Cart>>(`${URL}`, {
+    return http.get<SuccessResponse<CartList>>(`${URL}`, {
       params
     })
   },
@@ -23,8 +23,7 @@ const cartApi = {
   },
 
   getCartByIdKhachHang(idKhachHang: number) {
-    // return http.get<SuccessResponse<Cart>>(`${URL}khach-hang/${idKhachHang}`)
-    return http.get<SuccessResponse<Cart>>(`${URL}khach-hang/${idKhachHang}`)
+    return http.get<SuccessResponse<CartList>>(`${URL}khach-hang/${idKhachHang}`)
   }
 }
 

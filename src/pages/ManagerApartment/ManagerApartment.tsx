@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import productApi from '../../apis/product.api'
 import Paginate from '../../components/Pagination'
-import { ProductListConfig, Product as ProductType } from '../../types/product.type'
+import { ProductListConfig, ProductType } from '../../types/product.type'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { FaPlus, FaBuilding, FaSpinner } from 'react-icons/fa'
@@ -12,27 +12,25 @@ import { toast } from 'react-toastify'
 
 export default function ManagerApartment() {
   const [currentPage, setCurrentPage] = useState(1)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
-  const { data: productsData } = useQuery({
+  const { data: productResponse } = useQuery({
     queryKey: ['products'],
     queryFn: () => productApi.getProducts({} as ProductListConfig),
     onError: (error) => {
-      setError('Failed to fetch products')
-      console.error('Fetch error:', error)
+      console.error('Error loading products:', error)
+      toast.error('Failed to load products')
     }
   })
 
-  const products = productsData?.data || []
+  const products: ProductType[] = productResponse?.data?.data?.data || []
 
   const itemsPerPage = 12
-  const totalItems = products?.length || 0
+  const totalItems = products.length || 0
   const totalPages = Math.ceil(totalItems / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const currentProducts = products?.slice(startIndex, endIndex) || []
+  const currentProducts = products.slice(startIndex, endIndex) || []
 
   const queryClient = useQueryClient()
 
@@ -92,7 +90,7 @@ export default function ManagerApartment() {
           </motion.div>
         </motion.div>
 
-        {isLoading && (
+        {!productResponse && (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className='flex justify-center py-8'>
             <motion.div
               animate={{ rotate: 360 }}
@@ -104,16 +102,10 @@ export default function ManagerApartment() {
           </motion.div>
         )}
 
-        {error && (
-          <div className='text-center py-8 text-red-500 bg-red-50 rounded-lg'>
-            <p>{error}</p>
-          </div>
-        )}
-
-        {!isLoading && !error && (
+        {productResponse && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6'>
-              {currentProducts.map((product) => (
+              {currentProducts.map((product: ProductType) => (
                 <motion.div
                   key={product.id}
                   whileHover={{ scale: 1.02 }}

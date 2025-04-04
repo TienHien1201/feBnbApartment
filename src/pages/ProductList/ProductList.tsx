@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 import AsideFilter from './AsideFilter'
-import Product from './Product/Product'
+import ProductTsx from './Product/Product'
 import SortProductList from './SortProductList'
 import productApi from '../../apis/product.api'
 import Paginate from '../../components/Pagination'
-import { ProductListConfig } from '../../types/product.type'
+import { ProductListConfig, ProductType } from '../../types/product.type'
 import { useState, useEffect } from 'react'
 
 export default function ProductList() {
@@ -23,11 +23,11 @@ export default function ProductList() {
     }
   })
 
-  const [products, setProducts] = useState(productsData?.data || [])
+  const [products, setProducts] = useState<ProductType[]>([])
 
   useEffect(() => {
-    if (productsData?.data && !isFiltered) {
-      setProducts(productsData.data)
+    if (productsData?.data?.data && !isFiltered) {
+      setProducts(Array.isArray(productsData.data.data) ? productsData.data.data : [])
     }
   }, [productsData, isFiltered])
 
@@ -38,7 +38,7 @@ export default function ProductList() {
     setIsFiltered(true)
     try {
       const response = await productApi.getAllCanHoWithImagesByName(searchInput)
-      setProducts(response.data || [])
+      setProducts(Array.isArray(response.data?.data) ? response.data?.data : [])
     } catch (error) {
       setError('Search failed')
       console.error('Search error:', error)
@@ -53,7 +53,7 @@ export default function ProductList() {
     setIsFiltered(true)
     try {
       const response = await productApi.getCanHoByPhanKhu(id)
-      setProducts(response.data || [])
+      setProducts(Array.isArray(response.data?.data) ? response.data?.data : [])
     } catch (error) {
       setError('Filter failed')
       console.error('Filter error:', error)
@@ -67,7 +67,6 @@ export default function ProductList() {
     setError(null)
     setIsFiltered(true)
 
-    // Kiểm tra nếu min và max đều là 0
     if (min === 0 && max === 0) {
       setError('Vui lòng nhập ít nhất một giá trị cho khoảng giá.')
       setIsLoading(false)
@@ -75,15 +74,10 @@ export default function ProductList() {
     }
 
     try {
-      console.log('Calling API getCanHoByPriceRange with:', { min, max })
       const response = await productApi.getCanHoByPriceRange(min, max)
-      console.log('Full API response:', response)
-      console.log('response.data:', response.data)
-      if (response.data && Array.isArray(response.data)) {
-        setProducts(response.data)
-        console.log('Products updated:', response.data)
+      if (response.data?.data && Array.isArray(response.data.data)) {
+        setProducts(response.data.data)
       } else {
-        console.warn('response.data is not an array or is undefined:', response.data)
         setProducts([])
       }
     } catch (error) {
@@ -101,7 +95,7 @@ export default function ProductList() {
     setIsFiltered(true)
     try {
       const response = await productApi.getCanHoSorted(order)
-      setProducts(response.data || [])
+      setProducts(Array.isArray(response.data?.data) ? response.data?.data : [])
     } catch (error) {
       setError('Sort failed')
       console.error('Sort error:', error)
@@ -116,7 +110,7 @@ export default function ProductList() {
     setIsFiltered(true)
     try {
       const response = await productApi.getCanHoByFilter(type)
-      setProducts(response.data || [])
+      setProducts(Array.isArray(response.data?.data) ? response.data?.data : [])
     } catch (error) {
       setError('Filter failed')
       console.error('Filter error:', error)
@@ -214,9 +208,9 @@ export default function ProductList() {
             {!isLoading && !error && (
               <div className='grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4'>
                 {currentProducts.length > 0 ? (
-                  currentProducts.map((product) => (
+                  currentProducts.map((product: ProductType) => (
                     <div key={product.id}>
-                      <Product product={product} />
+                      <ProductTsx product={product} />
                     </div>
                   ))
                 ) : (

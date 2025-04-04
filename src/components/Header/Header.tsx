@@ -27,6 +27,7 @@ import {
   FaCompass,
   FaTools
 } from 'react-icons/fa'
+import Cart from '../../types/cart.type' // Thêm import này để sử dụng kiểu Cart
 
 const MAX_PRODUCTS_IN_CART = 5
 
@@ -67,8 +68,8 @@ export default function Header() {
     staleTime: 1000
   })
 
-  // Extract the array from the SuccessResponse wrapper
-  const productInCart = productInCartData?.data || []
+  // Sửa cách truy cập dữ liệu và thêm type assertion để giải quyết vấn đề
+  const productInCart = Array.isArray(productInCartData?.data?.data) ? (productInCartData.data.data as Cart[]) : []
 
   return (
     <div
@@ -197,11 +198,11 @@ export default function Header() {
               initialOpen
               renderPopover={
                 <div className='bg-white relative shadow-md rounded-sm border border-gray-200 max-w-[400px] text-sm'>
-                  {productInCartData?.data && productInCartData.data.length > 0 ? (
+                  {productInCart.length > 0 ? (
                     <div className='p-2'>
-                      <div className='text-gray-400 capitalize'>Sản phẩm mới thêm</div>
+                      <div className='text-gray-400 capitalize'>Sản phẩm mới thêm</div>
                       <div className='mt-5'>
-                        {productInCart.slice(0, MAX_PRODUCTS_IN_CART).map((prCart) => (
+                        {productInCart.slice(0, MAX_PRODUCTS_IN_CART).map((prCart: Cart) => (
                           <div className='mt-2 py-2 hover:bg-gray-100 flex' key={prCart.id}>
                             <div className='flex-shrink-0'>
                               <img
@@ -214,7 +215,9 @@ export default function Header() {
                               <div className='truncate'>{prCart.can_ho?.ten_toa_can_ho || 'Không có tên'}</div>
                             </div>
                             <div className='ml-2 flex-shrink-0'>
-                              <span className='text-green-500'>₫{formatCurrency(prCart.can_ho?.gia_ban || 0)}</span>
+                              <span className='text-green-500'>
+                                ₫{formatCurrency(Number(prCart.can_ho?.gia_ban || 0))}
+                              </span>
                             </div>
                           </div>
                         ))}
@@ -222,14 +225,14 @@ export default function Header() {
                       <div className='flex mt-4 items-center justify-between'>
                         <div className='mr-4 capitalize text-xs text-gray-500'>
                           {productInCart.length > MAX_PRODUCTS_IN_CART
-                            ? `${productInCart.length - MAX_PRODUCTS_IN_CART} Thêm vào giỏ hàng`
-                            : 'Thêm vào giỏ hàng'}
+                            ? `${productInCart.length - MAX_PRODUCTS_IN_CART} Thêm vào giỏ hàng`
+                            : 'Thêm vào giỏ hàng'}
                         </div>
                         <Link
                           to={path.cart}
                           className='capitalize bg-yellow-500 hover:bg-opacity-80 px-4 py-2 rounded-sm text-white'
                         >
-                          Xem giỏ hàng
+                          Xem giỏ hàng
                         </Link>
                       </div>
                     </div>
@@ -257,9 +260,9 @@ export default function Header() {
                     d='M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z'
                   />
                 </svg>
-                {productInCartData?.data && productInCartData.data.length > 0 && (
+                {productInCart.length > 0 && (
                   <span className='absolute left-[10px] top-[-5px] rounded-full px-[9px] py-[1px] bg-white text-yellow-500'>
-                    {productInCartData.data.length}
+                    {productInCart.length}
                   </span>
                 )}
               </Link>

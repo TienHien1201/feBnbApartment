@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Product as ProductType } from '../../types/product.type'
+import { ProductType } from '../../types/product.type'
 import { formatCurrency, generateNameID } from '../../utils/utils'
 import path from '../../constants/path'
 import StatusBadge from '../StatusBadge/StatusBadge'

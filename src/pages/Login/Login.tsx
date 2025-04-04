@@ -4,15 +4,13 @@ import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { useMutation } from '@tanstack/react-query'
 import authApi from '../../apis/auth.api'
-import { isAxiosUnprocessableEntityError } from '../../utils/utils'
-import { ErrorResponse } from '../../types/untils.type'
 import Input from '../../components/Input'
 import { useContext } from 'react'
 import { AppContext } from '../../contexts/app.context'
 import Button from '../../components/Button'
-import { omit } from 'lodash'
+
 import path from '../../constants/path'
-import { setIsAuthenticatedToLS, setProfileToLS, setTokensToLS } from '../../utils/auth'
+import { setProfileToLS, setTokensToLS } from '../../utils/auth'
 
 type FormData = LoginSchema
 
@@ -29,30 +27,22 @@ export default function Login() {
     resolver: yupResolver(loginSchema)
   })
 
-  const loginAccountMutation = useMutation({
-    mutationFn: (body: Omit<FormData, 'username'>) => authApi.loginAccount(body),
+  const loginMutation = useMutation({
+    mutationFn: (body: { email: string; password: string }) => authApi.loginAccount(body),
     onSuccess: (data) => {
-      console.log(data)
-      console.log(data.data.user)
-
       setIsAuthenticated(true)
       setProfile(data.data.user)
-
-      // Lưu vào localStorage
       setProfileToLS(data.data.user)
-
       setTokensToLS(data.data.access_token, data.data.refresh_token || '')
-      setIsAuthenticatedToLS(true)
-
-      navigate(path.product)
+      navigate(path.home)
     },
-    onError: (error) => {
-      if (isAxiosUnprocessableEntityError<ErrorResponse<Omit<FormData, 'username'>>>(error)) {
-        const formError = error.response?.data.data
+    onError: (error: any) => {
+      if (error.response?.status === 422) {
+        const formError = error.response?.data?.data
         if (formError) {
           Object.keys(formError).forEach((key) => {
-            setError(key as keyof Omit<FormData, 'username'>, {
-              message: formError[key as keyof Omit<FormData, 'username'>]
+            setError(key as keyof Pick<FormData, 'username' | 'password'>, {
+              message: formError[key as keyof Pick<FormData, 'username' | 'password'>]
             })
           })
         }
@@ -61,8 +51,11 @@ export default function Login() {
   })
 
   const onSubmit = handleSubmit((data) => {
-    const dataToSend = omit(data, ['username'])
-    loginAccountMutation.mutate(dataToSend)
+    const dataToSend = {
+      email: data.email,
+      password: data.password
+    }
+    loginMutation.mutate(dataToSend)
   })
 
   return (
@@ -139,8 +132,8 @@ export default function Login() {
             <Button
               type='submit'
               className='w-full py-4 px-2 uppercase bg-yellow-500 text-white rounded-md hover:bg-yellow-600 flex justify-center items-center'
-              isLoading={loginAccountMutation.isLoading}
-              disabled={loginAccountMutation.isLoading}
+              isLoading={loginMutation.isLoading}
+              disabled={loginMutation.isLoading}
             >
               Đăng nhập
             </Button>

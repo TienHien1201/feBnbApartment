@@ -14,6 +14,7 @@ import {
 } from 'react-icons/fa'
 import bgImage from '../../assets/VinhomesBg.jpg'
 import { getProfileFromLS } from '../../utils/auth'
+import { bookingType } from '../../types/booking.type'
 
 export default function BookingHistory() {
   const profileData = getProfileFromLS()
@@ -25,15 +26,20 @@ export default function BookingHistory() {
     enabled: Boolean(userId) // Chỉ gọi API khi có userId
   })
 
-  const bookings = historyBookingData?.data || []
+  // Đảm bảo bookingsData luôn là một mảng và chỉ định rõ kiểu dữ liệu
+  const bookingsData = (
+    Array.isArray(historyBookingData?.data) ? historyBookingData?.data : historyBookingData?.data?.data || []
+  ) as bookingType[]
+
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 6
 
-  const totalItems = bookings.length || 0
+  // Bây giờ chúng ta có thể an toàn sử dụng các phương thức mảng
+  const totalItems = bookingsData.length
   const totalPages = Math.ceil(totalItems / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const currentItems = bookings.slice(startIndex, endIndex) || []
+  const currentItems = bookingsData.slice(startIndex, endIndex)
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)

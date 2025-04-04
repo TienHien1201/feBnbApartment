@@ -1,4 +1,4 @@
-import { Product, ProductList, ProductListConfig, CreateProduct } from '../types/product.type'
+import { ProductType, ProductList, ProductListConfig, CreateProduct } from '../types/product.type'
 import { SuccessResponse } from '../types/untils.type'
 import http from '../utils/http'
 
@@ -10,13 +10,13 @@ const productApi = {
     return http.get<SuccessResponse<ProductList>>(URL, { params })
   },
   getProductDetails(id: string) {
-    return http.get<SuccessResponse<Product>>(`${URL}/${id}`)
+    return http.get<SuccessResponse<ProductType>>(`${URL}/${id}`)
   },
   getProductByName(name: string) {
     return http.get<SuccessResponse<ProductList>>(`${Base_URL_Product}/name/${name}`)
   },
   addProduct(body: CreateProduct) {
-    return http.post<SuccessResponse<Product>>(Base_URL_Product, body)
+    return http.post<SuccessResponse<ProductType>>(Base_URL_Product, body)
   },
   getCanHoByPhanKhu(id: number) {
     return http.get<SuccessResponse<ProductList>>(`${Base_URL_Product}/phan-khu/${id}`)
@@ -40,11 +40,11 @@ const productApi = {
   getAllCanHoWithImagesByName(name: string) {
     return http.get<SuccessResponse<ProductList>>(`${Base_URL_Product}/name/${name}`)
   },
-  updateProduct(id: string, body: Partial<Product>) {
-    return http.put<SuccessResponse<Product>>(`${Base_URL_Product}/${id}`, body)
+  updateProduct(id: string, body: Partial<ProductType>) {
+    return http.put<SuccessResponse<ProductType>>(`${Base_URL_Product}/${id}`, body)
   },
   deleteProduct(id: string) {
-    return http.delete<SuccessResponse<Product>>(`${Base_URL_Product}/${id}`)
+    return http.delete<SuccessResponse<ProductType>>(`${Base_URL_Product}/${id}`)
   }
 }
 

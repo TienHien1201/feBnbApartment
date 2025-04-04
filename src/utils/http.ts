@@ -44,8 +44,8 @@ class Https {
         if (url === path.login || url === path.register) {
           const data = response.data as AuthResponse
           // Lưu profile, token và trạng thái isAuthenticated
-          setProfileToLS(data.data.user)
-          setTokensToLS(data.data.access_token, data.data.refresh_token || '')
+          setProfileToLS(data.user)
+          setTokensToLS(data.access_token, data.refresh_token || '')
           setIsAuthenticatedToLS(true)
         } else if (url === path.logout) {
           clearLS()

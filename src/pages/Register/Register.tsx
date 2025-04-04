@@ -30,7 +30,7 @@ export default function Register() {
 
   const registerAccountMutation = useMutation({
     mutationFn: (body: Omit<FormData, 'confirm_password'>) => authApi.registerAccount(body),
-    onSuccess: (data) => {
+    onSuccess: () => {
       navigate(path.login)
     },
     onError: (error) => {

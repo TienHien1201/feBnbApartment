@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Product } from '../../types/product.type'
+import { ProductType } from '../../types/product.type'
 import productApi from '../../apis/product.api'
 import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
@@ -21,7 +21,7 @@ import path from '../../constants/path'
 export default function EditApartment() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [formData, setFormData] = useState<Product | null>(null)
+  const [formData, setFormData] = useState<ProductType | null>(null)
 
   const { data: productData, isLoading } = useQuery({
     queryKey: ['product', id],
@@ -30,7 +30,7 @@ export default function EditApartment() {
 
   useEffect(() => {
     if (productData?.data) {
-      setFormData(productData.data as unknown as Product)
+      setFormData(productData.data as unknown as ProductType)
     }
   }, [productData])
 
@@ -40,7 +40,7 @@ export default function EditApartment() {
   }
 
   const updateProductMutation = useMutation({
-    mutationFn: (body: Partial<Product>) => productApi.updateProduct(id as string, body),
+    mutationFn: (body: Partial<ProductType>) => productApi.updateProduct(id as string, body),
     onSuccess: () => {
       toast.success('Cập nhật thành công!')
       navigate(path.Admin)

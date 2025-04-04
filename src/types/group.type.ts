@@ -1,4 +1,4 @@
-import { Product } from './product.type'
+import { ProductType } from './product.type'
 
 export interface GroupType {
   id: number
@@ -8,5 +8,5 @@ export interface GroupType {
   tien_ich: string
   loai_hinh_san_pham: string
   created_at: string
-  can_ho: Product
+  can_ho: ProductType
 }

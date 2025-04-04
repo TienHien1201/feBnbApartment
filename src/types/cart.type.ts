@@ -26,7 +26,13 @@ export interface Cart {
     ten_toa_can_ho: string
     hinh_anh_can_ho?: Array<{ duong_dan_hinh: string }>
     gia_ban?: string | number
+    gia_thu_ve?: string | number
   }
+}
+
+// Add this type for cart arrays
+export interface CartList {
+  data: Cart[]
 }
 
 export default Cart
